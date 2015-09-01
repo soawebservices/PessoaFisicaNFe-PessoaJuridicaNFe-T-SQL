@@ -12,28 +12,18 @@ Acesse no site: http://www.soawebservices.com.br/clientes/
 
 #Antes de rodar as Stored Procedures é necessário reconfigurar o SQL Server (2005 ou superior)
 
+use [master]
 sp_configure 'show advanced options', 1
-
 GO
-
-
 RECONFIGURE;
-
 GO
-
-
 sp_configure 'Ole Automation Procedures', 1
-
 GO
-
 RECONFIGURE;
-
 GO
-
 sp_configure 'show advanced options', 1
-
 GO
-
 RECONFIGURE;
+
 
 
