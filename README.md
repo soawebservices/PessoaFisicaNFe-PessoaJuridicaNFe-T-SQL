@@ -1,4 +1,4 @@
-# PessoaFisicaNFe-T-SQL
+# PessoaFisicaNFe / PessoaJuridicaNFe - T-SQL
 SOAWebServices www.soawebservices.com.br
 
 Exemplo de como consumir o webservice PessoaFisicaNFe em T-SQL
