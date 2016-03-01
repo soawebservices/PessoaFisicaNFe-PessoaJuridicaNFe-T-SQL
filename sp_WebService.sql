@@ -1,11 +1,12 @@
-USE [Seu Banco de dados]
+USE [Seu Banco de Dados]
 GO
-/****** Object:  StoredProcedure [dbo].[sp_WebService]    Script Date: 01/09/2015  ******/
+/****** Object:  StoredProcedure [dbo].[sp_WebService]    Script Date: 01/03/2016 12:52:50 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 
+-- ALTER ou CREATE
 ALTER proc [dbo].[sp_WebService] 
       @URI varchar(2000) = '',      
       @methodName varchar(50) = '', 
@@ -13,7 +14,7 @@ ALTER proc [dbo].[sp_WebService]
       @SoapAction varchar(255), 
       @UserName nvarchar(100), -- Domain\UserName or UserName 
       @Password nvarchar(100), 
-      @responseText varchar(8000) output
+      @responsexml xml output
 as
 SET NOCOUNT ON
 IF    @methodName = ''
@@ -21,10 +22,12 @@ BEGIN
       select FailPoint = 'Nome do Method é obrigatorio'
       return
 END
+declare @responseText varchar(8000)
 set   @responseText = 'FALHOU'
 DECLARE @objectID int
 DECLARE @hResult int
 DECLARE @source varchar(255), @desc varchar(255) 
+DECLARE @t table (ID int, Content TEXT)
 EXEC @hResult = sp_OACreate 'MSXML2.ServerXMLHTTP', @objectID OUT
 IF @hResult <> 0 
 BEGIN
@@ -107,9 +110,10 @@ declare @statusText varchar(1000), @status varchar(1000)
 -- Get status text 
 exec sp_OAGetProperty @objectID, 'StatusText', @statusText out
 exec sp_OAGetProperty @objectID, 'Status', @status out
---select @status, @statusText, @methodName 
+select @status, @statusText, @methodName 
 -- Get response text 
-exec sp_OAGetProperty @objectID, 'responseText', @responseText out
+Insert into @t (Content) 
+     exec sp_OAGetProperty @objectID, 'responseText'
 IF @hResult <> 0 
 BEGIN
       EXEC sp_OAGetErrorInfo @objectID, @source OUT, @desc OUT
@@ -121,6 +125,7 @@ BEGIN
       goto destroy 
       return
 END
+select @responsexml =  cast(Content as xml) from @t 
 destroy: 
       exec sp_OADestroy @objectID 
 SET NOCOUNT OFF
